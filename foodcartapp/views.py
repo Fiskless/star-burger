@@ -64,11 +64,11 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    order_data = json.loads(request.body.decode())
+    order_data = request.data
     order = Order.objects.create(first_name=order_data['firstname'], last_name=order_data['lastname'], phone_number=order_data['phonenumber'], address=order_data['address'])
     for product in order_data['products']:
         product_name = Product.objects.get(id=product['product'])
         product_quantity = product['quantity']
         OrderProduct.objects.create(product=product_name, quantity=product_quantity, order=order)
 
-    return Response()
+    return Response({})

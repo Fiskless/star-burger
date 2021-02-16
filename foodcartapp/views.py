@@ -3,6 +3,7 @@ from django.templatetags.static import static
 import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
 
 from .models import Product
@@ -65,10 +66,21 @@ def product_list_api(request):
 @api_view(['POST'])
 def register_order(request):
     order_data = request.data
-    order = Order.objects.create(first_name=order_data['firstname'], last_name=order_data['lastname'], phone_number=order_data['phonenumber'], address=order_data['address'])
-    for product in order_data['products']:
-        product_name = Product.objects.get(id=product['product'])
-        product_quantity = product['quantity']
-        OrderProduct.objects.create(product=product_name, quantity=product_quantity, order=order)
+    order = Order.objects.create(first_name=order_data['firstname'],
+                                 last_name=order_data['lastname'],
+                                 phone_number=order_data['phonenumber'],
+                                 address=order_data['address'])
 
-    return Response({})
+    error = {}
+    if 'products' not in order_data or not isinstance(order_data['products'], list) or not order_data['products']:
+        error = {"error": "products key not presented or not list"}
+
+    else:
+        for product in order_data['products']:
+            product_name = Product.objects.get(id=product['product'])
+            product_quantity = product['quantity']
+            OrderProduct.objects.create(product=product_name,
+                                        quantity=product_quantity,
+                                        order=order)
+
+    return Response(error, status=status.HTTP_400_BAD_REQUEST)

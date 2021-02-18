@@ -2,9 +2,8 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from django.http.response import Http404
-
+from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import CharField
 
 from .models import Product
 from .models import Order
@@ -63,50 +62,34 @@ def product_list_api(request):
     })
 
 
+class OrderProductSerializer(ModelSerializer):
+    class Meta:
+        model = OrderProduct
+        fields = ['product', 'quantity']
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderProductSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ['products', 'firstname', 'lastname', 'phonenumber', 'address']
+
+
 @api_view(['POST'])
 def register_order(request):
-    error = {}
-    try:
-        order_data = request.data
-        if not isinstance(order_data['firstname'], str) \
-            or not isinstance(order_data['lastname'], str) \
-            or not isinstance(order_data['phonenumber'], str) \
-            or not isinstance(order_data['address'], str):
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    order = Order.objects.create(firstname=serializer.validated_data['firstname'],
+                                 lastname=serializer.validated_data['lastname'],
+                                 phonenumber=serializer.validated_data['phonenumber'],
+                                 address=serializer.validated_data['address'])
+    for product in serializer.validated_data['products']:
+        product_name = Product.objects.get(id=product['product'].id)
+        print(product['product'].id)
+        product_quantity = product['quantity']
+        OrderProduct.objects.create(product=product_name,
+                                    quantity=product_quantity,
+                                    order=order)
 
-            error = {"error": "the order key is not specified or not str"}
-
-        if order_data['firstname'] == "" \
-            or order_data['lastname'] == "" \
-            or order_data['phonenumber'] == "" \
-            or order_data['address'] == "":
-            error = {"error": "order key is empty "}
-
-        order = Order.objects.create(first_name=order_data['firstname'],
-                                     last_name=order_data['lastname'],
-                                     phone_number=order_data['phonenumber'],
-                                     address=order_data['address'])
-
-        if 'products' not in order_data \
-            or not isinstance(order_data['products'], list) \
-            or not order_data['products']:
-
-            error = {"error": "products key not presented or not list"}
-
-        else:
-            for product in order_data['products']:
-                try:
-                    if not isinstance(product['product'], int):
-                        error = {"error": "the product id is not specified or not str"}
-                        break
-
-                    product_name = Product.objects.get(id=product['product'])
-                    product_quantity = product['quantity']
-                    OrderProduct.objects.create(product=product_name,
-                                                quantity=product_quantity,
-                                                order=order)
-                except Product.DoesNotExist:
-                    error = {"error": "product id does not exist"}
-    except KeyError:
-        error = {"error": "order value not presented"}
-
-    return Response(error)
+    return Response({})

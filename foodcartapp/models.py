@@ -70,13 +70,13 @@ class RestaurantMenuItem(models.Model):
 
 
 class Order(models.Model):
-    first_name = models.CharField('Имя', max_length=50, null=True)
-    last_name = models.CharField('Фамилия', max_length=50, null=True)
-    phone_number = PhoneNumberField('Телефон', null=True)
-    address = models.CharField('Адрес', max_length=100, blank=True, null=True)
+    firstname = models.CharField('Имя', max_length=50)
+    lastname = models.CharField('Фамилия', max_length=50)
+    phonenumber = PhoneNumberField('Телефон')
+    address = models.CharField('Адрес', max_length=100)
 
     def __str__(self):
-        return (f"{self.first_name} {self.last_name}, {self.address}")
+        return (f"{self.firstname} {self.lastname}, {self.address}")
 
     class Meta:
         verbose_name = 'заказ'
@@ -85,9 +85,9 @@ class Order(models.Model):
 
 class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items',
-                                   verbose_name="название", null=True, blank=True)
-    quantity = models.IntegerField('количество', null=True, blank=True, validators=[MinValueValidator(0)])
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
+                                   verbose_name="название")
+    quantity = models.IntegerField('количество', validators=[MinValueValidator(0)])
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
         return self.product.name

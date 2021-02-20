@@ -76,7 +76,7 @@ class OrderSerializer(ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['products', 'firstname', 'lastname', 'phonenumber', 'address']
+        fields = ['products', 'id', 'firstname', 'lastname', 'phonenumber', 'address']
 
 
 @api_view(['POST'])
@@ -94,6 +94,6 @@ def register_order(request):
         OrderProduct.objects.create(product=product_name,
                                     quantity=product_quantity,
                                     order=order)
-    serializer_for_frontend = OrderSerializer(order)
+    order_data_for_frontend = OrderSerializer(order)
 
-    return Response(serializer_for_frontend.data)
+    return Response(order_data_for_frontend.data)

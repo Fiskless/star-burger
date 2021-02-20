@@ -3,7 +3,7 @@ from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import CharField
+from rest_framework.renderers import JSONRenderer
 
 from .models import Product
 from .models import Order
@@ -69,7 +69,10 @@ class OrderProductSerializer(ModelSerializer):
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderProductSerializer(many=True)
+    products = OrderProductSerializer(many=True, write_only=True)
+
+    def create(self, validated_data):
+        return Order.objects.create(**validated_data)
 
     class Meta:
         model = Order
@@ -91,5 +94,6 @@ def register_order(request):
         OrderProduct.objects.create(product=product_name,
                                     quantity=product_quantity,
                                     order=order)
+    serializer_for_frontend = OrderSerializer(order)
 
-    return Response({})
+    return Response(serializer_for_frontend.data)

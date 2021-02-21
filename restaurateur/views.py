@@ -102,9 +102,10 @@ def view_orders(request):
 
     order_items = []
 
-    for order in Order.objects.all():
+    for order in Order.objects.order_price():
         order_data = {
             'id': order.id,
+            'order_price': order.total_price,
             'client': f'{order.firstname} {order.lastname}',
             'phone': order.phonenumber,
             'address': order.address

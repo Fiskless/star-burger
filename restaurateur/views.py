@@ -112,8 +112,6 @@ def view_orders(request):
         }
         order_items.append(order_data)
 
-    print(order_items)
-
     return render(request,
                   template_name='order_items.html',
                   context={'order_items': order_items})

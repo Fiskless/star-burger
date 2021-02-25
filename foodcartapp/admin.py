@@ -112,7 +112,7 @@ class OrderProductInline(admin.TabularInline):
     model = OrderProduct
     extra = 0
     list_display = ['product', 'quantity', 'price']
-    readonly_fields = ['quantity', 'price']
+    readonly_fields = ['product', 'quantity', 'price']
 
 
 @admin.register(Order)

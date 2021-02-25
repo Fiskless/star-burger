@@ -112,9 +112,7 @@ class OrderProductInline(admin.TabularInline):
     model = OrderProduct
     extra = 0
     list_display = ['product', 'quantity', 'price']
-
-    def has_change_permission(self, request, obj=True):
-        return False
+    readonly_fields = ['quantity', 'price']
 
 
 @admin.register(Order)

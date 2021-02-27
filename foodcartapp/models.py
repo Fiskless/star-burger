@@ -89,15 +89,14 @@ class Order(models.Model):
         ("Необработанный", "необработанный"),
         ("Обработанный", "обработанный")
     ]
-
+    order_status = models.CharField("Статус заказа", max_length=20,
+                                    choices=ORDER_STATUS_CHOICES,
+                                    default="необработанный")
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')
     address = models.CharField('Адрес', max_length=100)
-    order_status = models.CharField("Статус заказа", max_length=20,
-                                    choices=ORDER_STATUS_CHOICES,
-                                    default="необработанный")
-
+    comment = models.TextField('Комментарий к заказу', max_length=200, default='')
     objects = OrderQueryset.as_manager()
 
     def __str__(self):

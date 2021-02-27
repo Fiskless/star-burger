@@ -104,6 +104,7 @@ def view_orders(request):
     for order in Order.objects.order_price():
         order_data = {
             'id': order.id,
+            'order_status': order.order_status,
             'order_price': order.total_price,
             'client': f'{order.firstname} {order.lastname}',
             'phone': order.phonenumber,

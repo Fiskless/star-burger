@@ -2,6 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 from django.db.models import Sum, F, DecimalField
+from django.utils import timezone
+
 
 
 class Restaurant(models.Model):
@@ -78,8 +80,6 @@ class OrderQueryset(models.QuerySet):
             output_field=DecimalField())
         )
 
-        # F('products__product__price')
-
         return total_price
 
 
@@ -96,7 +96,12 @@ class Order(models.Model):
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')
     address = models.CharField('Адрес', max_length=100)
-    comment = models.TextField('Комментарий к заказу', max_length=200, default='')
+    comment = models.TextField('Комментарий к заказу', max_length=200, default='', blank=True)
+    registrated_at = models.DateTimeField("Время создания заказа", default=timezone.now)
+    called_at = models.DateTimeField("Время звонка", blank=True, null=True)
+    delivered_at = models.DateTimeField("Время доставки", blank=True, null=True)
+
+
     objects = OrderQueryset.as_manager()
 
     def __str__(self):

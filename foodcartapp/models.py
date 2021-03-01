@@ -89,9 +89,17 @@ class Order(models.Model):
         ("Необработанный", "необработанный"),
         ("Обработанный", "обработанный")
     ]
+
+    PAYMENT_METHOD_CHOICES = [
+        ("Наличностью", "наличностью"),
+        ("Электронно", "электронно")
+    ]
+
     order_status = models.CharField("Статус заказа", max_length=20,
                                     choices=ORDER_STATUS_CHOICES,
                                     default="необработанный")
+    payment_method = models.CharField("Способ оплаты", max_length=20,
+                                    choices=PAYMENT_METHOD_CHOICES, blank=True)
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')

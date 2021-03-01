@@ -109,7 +109,8 @@ def view_orders(request):
             'client': f'{order.firstname} {order.lastname}',
             'phone': order.phonenumber,
             'address': order.address,
-            'comment': order.comment
+            'comment': order.comment,
+            'payment_method': order.payment_method
         }
         order_items.append(order_data)
 

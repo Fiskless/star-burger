@@ -6,10 +6,12 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
+
 from foodcartapp.models import Order
-
-
+from foodcartapp.models import RestaurantMenuItem
 from foodcartapp.models import Product, Restaurant
+
+from collections import Counter
 
 
 class Login(forms.Form):
@@ -100,8 +102,18 @@ def view_restaurants(request):
 def view_orders(request):
 
     order_items = []
-
     for order in Order.objects.order_price():
+
+        restaurant_list = []
+        for product in order.products.all():
+            restaurant_list_for_product = []
+            for menu_item in (RestaurantMenuItem.objects.select_related('product', 'restaurant').filter(product__id=product.product.id, availability=True)):
+                restaurant_list_for_product.append(menu_item.restaurant)
+            restaurant_list.append(restaurant_list_for_product)
+        result_restaurant_list = restaurant_list[0]
+        for restaurant in restaurant_list:
+            result_restaurant_list = (set(result_restaurant_list)&set(restaurant))
+
         order_data = {
             'id': order.id,
             'order_status': order.order_status,
@@ -110,8 +122,10 @@ def view_orders(request):
             'phone': order.phonenumber,
             'address': order.address,
             'comment': order.comment,
-            'payment_method': order.payment_method
+            'payment_method': order.payment_method,
+            'restaurant': list(result_restaurant_list)
         }
+
         order_items.append(order_data)
 
     return render(request,

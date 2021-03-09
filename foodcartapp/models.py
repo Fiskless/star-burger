@@ -108,6 +108,8 @@ class Order(models.Model):
     registrated_at = models.DateTimeField("Время создания заказа", default=timezone.now)
     called_at = models.DateTimeField("Время звонка", blank=True, null=True)
     delivered_at = models.DateTimeField("Время доставки", blank=True, null=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='order_items',
+                                   verbose_name="Ресторан", null=True)
 
 
     objects = OrderQueryset.as_manager()

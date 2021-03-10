@@ -11,7 +11,9 @@ from foodcartapp.models import Order
 from foodcartapp.models import RestaurantMenuItem
 from foodcartapp.models import Product, Restaurant
 
-from collections import Counter
+import requests
+from geopy import distance
+
 
 
 class Login(forms.Form):
@@ -98,12 +100,33 @@ def view_restaurants(request):
     })
 
 
+from environs import Env
+
+env = Env()
+env.read_env()
+
+GEO_APIKEY = env('GEO_APIKEY')
+
+def fetch_coordinates(apikey, place):
+    base_url = "https://geocode-maps.yandex.ru/1.x"
+    params = {"geocode": place, "apikey": apikey, "format": "json"}
+    response = requests.get(base_url, params=params)
+    response.raise_for_status()
+    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+    most_relevant = found_places[0]
+    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
+    return lat, lon
+
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
     order_items = []
+
     for order in Order.objects.order_price():
 
+        order_coordinates = fetch_coordinates(GEO_APIKEY, order.address)
         restaurant_list = []
         for product in order.products.all():
             restaurant_list_for_product = []
@@ -112,7 +135,18 @@ def view_orders(request):
             restaurant_list.append(restaurant_list_for_product)
         result_restaurant_list = restaurant_list[0]
         for restaurant in restaurant_list:
-            result_restaurant_list = (set(result_restaurant_list)&set(restaurant))
+            result_restaurant_list = (set(result_restaurant_list) & set(restaurant))
+        distance_to_restaurant = []
+        for restaurant in list(result_restaurant_list):
+            restaurant_coordinates = fetch_coordinates(GEO_APIKEY, restaurant.address)
+            distance_to_restaurant.append(round(distance.distance(order_coordinates, restaurant_coordinates).km, 3))
+        restaurant_distance_dict = dict(zip(list(result_restaurant_list), distance_to_restaurant))
+        sorted_restaurant_distance_dict = {}
+        sorted_restaurant_distance_dict_keys = sorted(restaurant_distance_dict, key=restaurant_distance_dict.get)
+
+        for key in sorted_restaurant_distance_dict_keys:
+            sorted_restaurant_distance_dict[key] = restaurant_distance_dict[key]
+        print(sorted_restaurant_distance_dict)
 
         order_data = {
             'id': order.id,
@@ -123,7 +157,7 @@ def view_orders(request):
             'address': order.address,
             'comment': order.comment,
             'payment_method': order.payment_method,
-            'restaurant': list(result_restaurant_list)
+            'restaurant_distance': sorted_restaurant_distance_dict
         }
 
         order_items.append(order_data)
@@ -131,3 +165,5 @@ def view_orders(request):
     return render(request,
                   template_name='order_items.html',
                   context={'order_items': order_items})
+
+

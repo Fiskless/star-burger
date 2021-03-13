@@ -109,7 +109,7 @@ class Order(models.Model):
     called_at = models.DateTimeField("Время звонка", blank=True, null=True)
     delivered_at = models.DateTimeField("Время доставки", blank=True, null=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='order_items',
-                                   verbose_name="Ресторан", null=True)
+                                   verbose_name="Ресторан", null=True, blank=True)
 
 
     objects = OrderQueryset.as_manager()
@@ -129,10 +129,23 @@ class OrderProduct(models.Model):
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], null=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
 
-
     def __str__(self):
         return self.product.name
 
     class Meta:
         verbose_name = 'заказанный товар'
         verbose_name_plural = 'заказанные товары'
+
+
+class Place(models.Model):
+    address = models.CharField('адрес', max_length=100, blank=True)
+    lat = models.FloatField('Ширина', max_length=20)
+    lon = models.FloatField('Долгота', max_length=20)
+    time = models.DateTimeField("Дата запроса к геокодеру", default=timezone.now)
+
+    def __str__(self):
+        return self.address
+
+    class Meta:
+        verbose_name = 'место'
+        verbose_name_plural = 'места'

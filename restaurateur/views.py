@@ -9,7 +9,8 @@ from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Order
 from foodcartapp.models import RestaurantMenuItem
-from foodcartapp.models import Product, Restaurant, Place
+from foodcartapp.models import Product, Restaurant
+from place.models import Place
 
 import requests
 from geopy import distance

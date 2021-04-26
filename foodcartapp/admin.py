@@ -11,7 +11,7 @@ from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
-from .models import OrderProduct, Place
+from .models import OrderProduct
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -142,7 +142,5 @@ class OrderProductAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(Place)
-class PlaceAdmin(admin.ModelAdmin):
-    pass
+
 

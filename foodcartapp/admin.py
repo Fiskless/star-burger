@@ -124,6 +124,7 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderProductInline
     ]
+    search_fields = ['address']
 
     def response_change(self, request, obj):
         res = super().response_change(request, obj)
@@ -137,7 +138,9 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderProduct)
 class OrderProductAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ["order"]
+    autocomplete_fields = ['order']
+
 
 
 @admin.register(Place)

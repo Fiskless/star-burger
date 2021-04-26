@@ -137,7 +137,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items',
                                    verbose_name="название")
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0)])
-    price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], null=True)
+    price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
@@ -149,7 +149,7 @@ class OrderProduct(models.Model):
 
 
 class Place(models.Model):
-    address = models.CharField('адрес', max_length=100, blank=True, unique=True)
+    address = models.CharField('адрес', max_length=100, unique=True)
     lat = models.FloatField('Ширина', max_length=20)
     lon = models.FloatField('Долгота', max_length=20)
     time = models.DateTimeField("Дата запроса к геокодеру",

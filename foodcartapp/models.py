@@ -97,19 +97,30 @@ class Order(models.Model):
 
     order_status = models.CharField("Статус заказа", max_length=20,
                                     choices=ORDER_STATUS_CHOICES,
-                                    default="необработанный")
+                                    default="необработанный",
+                                    db_index=True)
     payment_method = models.CharField("Способ оплаты", max_length=20,
-                                    choices=PAYMENT_METHOD_CHOICES, blank=True)
+                                      choices=PAYMENT_METHOD_CHOICES,
+                                      blank=True,
+                                      db_index=True)
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')
     address = models.CharField('Адрес', max_length=100)
-    comment = models.TextField('Комментарий к заказу', max_length=200, default='', blank=True)
-    registrated_at = models.DateTimeField("Время создания заказа", default=timezone.now)
+    comment = models.TextField('Комментарий к заказу',
+                               max_length=200,
+                               default='',
+                               blank=True)
+    registrated_at = models.DateTimeField("Время создания заказа",
+                                          default=timezone.now)
     called_at = models.DateTimeField("Время звонка", blank=True, null=True)
     delivered_at = models.DateTimeField("Время доставки", blank=True, null=True)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='order_items',
-                                   verbose_name="Ресторан", null=True, blank=True)
+    restaurant = models.ForeignKey(Restaurant,
+                                   on_delete=models.CASCADE,
+                                   related_name='order_items',
+                                   verbose_name="Ресторан",
+                                   null=True,
+                                   blank=True)
 
 
     objects = OrderQueryset.as_manager()
@@ -141,7 +152,9 @@ class Place(models.Model):
     address = models.CharField('адрес', max_length=100, blank=True)
     lat = models.FloatField('Ширина', max_length=20)
     lon = models.FloatField('Долгота', max_length=20)
-    time = models.DateTimeField("Дата запроса к геокодеру", default=timezone.now)
+    time = models.DateTimeField("Дата запроса к геокодеру",
+                                default=timezone.now,
+                                db_index=True)
 
     def __str__(self):
         return self.address

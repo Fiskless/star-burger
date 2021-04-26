@@ -125,7 +125,7 @@ class Order(models.Model):
                                         blank=True, null=True)
     restaurant = models.ForeignKey(Restaurant,
                                    on_delete=models.CASCADE,
-                                   related_name='order_items',
+                                   related_name='orders',
                                    verbose_name="Ресторан",
                                    null=True,
                                    blank=True)

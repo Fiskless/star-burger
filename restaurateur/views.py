@@ -110,7 +110,7 @@ def view_restaurants(request):
 def fetch_coordinates(apikey, place):
 
     place_data = Place.objects.filter(address=place).first()
-    if place_data==None:
+    if place_data is None:
         base_url = "https://geocode-maps.yandex.ru/1.x"
         params = {"geocode": place, "apikey": apikey, "format": "json"}
         response = requests.get(base_url, params=params)
@@ -134,7 +134,7 @@ def view_orders(request):
             [menu_item.restaurant for menu_item in (
             RestaurantMenuItem.objects.select_related('product', 'restaurant').
                 filter(product__id=product.product.id, availability=True))
-             ] for product in order.products.all() ]
+             ] for product in order.products.all()]
         result_restaurant_list = restaurant_list[0]
         for restaurant in restaurant_list:
             result_restaurant_list = (set(result_restaurant_list) & set(restaurant))

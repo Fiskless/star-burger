@@ -64,6 +64,7 @@ def product_list_api(request):
 
 
 class OrderProductSerializer(ModelSerializer):
+
     class Meta:
         model = OrderProduct
         fields = ['product', 'quantity', 'price']
@@ -71,6 +72,7 @@ class OrderProductSerializer(ModelSerializer):
 
 class OrderSerializer(ModelSerializer):
     products = OrderProductSerializer(many=True, write_only=True)
+
 
     def create(self, validated_data):
         return Order.objects.create(**validated_data)

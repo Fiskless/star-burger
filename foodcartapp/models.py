@@ -138,7 +138,7 @@ class OrderProduct(models.Model):
                                    verbose_name="название")
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0)])
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], null=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
+    order = models.ForeignKey(Order, verbose_name='заказ', on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
         return self.product.name

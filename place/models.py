@@ -10,9 +10,11 @@ class Place(models.Model):
                                 default=timezone.now,
                                 db_index=True)
 
-    def __str__(self):
-        return self.address
-
     class Meta:
         verbose_name = 'место'
         verbose_name_plural = 'места'
+
+    def __str__(self):
+        return self.address
+
+

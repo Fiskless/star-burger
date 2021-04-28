@@ -71,7 +71,9 @@ class OrderProductSerializer(ModelSerializer):
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderProductSerializer(many=True, write_only=True)
+    products = OrderProductSerializer(many=True,
+                                      write_only=True,
+                                      allow_empty=False)
 
     def create(self, validated_data):
         return Order.objects.create(**validated_data)
@@ -84,7 +86,6 @@ class OrderSerializer(ModelSerializer):
 @transaction.atomic
 @api_view(['POST'])
 def register_order(request):
-    print(request.data)
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     order = Order.objects.create(

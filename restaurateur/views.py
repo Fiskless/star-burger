@@ -14,7 +14,6 @@ from place.models import Place
 
 import requests
 from geopy import distance
-from django.core.exceptions import ObjectDoesNotExist
 from environs import Env
 
 env = Env()

@@ -5,7 +5,6 @@ from django.db.models import Sum, F, DecimalField
 from django.utils import timezone
 
 
-
 class Restaurant(models.Model):
     name = models.CharField('название', max_length=50)
     address = models.CharField('адрес', max_length=100, blank=True)
@@ -116,7 +115,6 @@ class Order(models.Model):
     address = models.CharField('Адрес', max_length=100)
     comment = models.TextField('Комментарий к заказу',
                                max_length=200,
-                               default='',
                                blank=True)
     registrated_at = models.DateTimeField("Время создания заказа",
                                           default=timezone.now)

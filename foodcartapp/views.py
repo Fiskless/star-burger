@@ -67,36 +67,35 @@ class OrderProductSerializer(ModelSerializer):
 
     class Meta:
         model = OrderProduct
-        fields = ['product', 'quantity', 'price']
+        fields = ['product', 'quantity']
 
 
 class OrderSerializer(ModelSerializer):
     products = OrderProductSerializer(many=True, write_only=True)
-
 
     def create(self, validated_data):
         return Order.objects.create(**validated_data)
 
     class Meta:
         model = Order
-        fields = ['products', 'id', 'firstname', 'lastname', 'phonenumber', 'address']
+        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
 
 
 @transaction.atomic
 @api_view(['POST'])
 def register_order(request):
+    print(request.data)
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    order = Order.objects.create(firstname=serializer.validated_data['firstname'],
-                                 lastname=serializer.validated_data['lastname'],
-                                 phonenumber=serializer.validated_data['phonenumber'],
-                                 address=serializer.validated_data['address'])
+    order = Order.objects.create(
+        firstname=serializer.validated_data['firstname'],
+        lastname=serializer.validated_data['lastname'],
+        phonenumber=serializer.validated_data['phonenumber'],
+        address=serializer.validated_data['address'])
     for product in serializer.validated_data['products']:
-        product_price = product['product'].price
-        product_quantity = product['quantity']
         OrderProduct.objects.create(product=product['product'],
-                                    quantity=product_quantity,
-                                    price=product_price,
+                                    quantity=product['quantity'],
+                                    price=product['product'].price,
                                     order=order)
 
     order_data_for_frontend = OrderSerializer(order)

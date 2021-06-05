@@ -139,12 +139,12 @@ def view_orders(request):
         for restaurant in restaurant_list:
             result_restaurant_list = (set(result_restaurant_list) & set(restaurant))
         distance_to_restaurant = []
-        for restaurant in list(result_restaurant_list):
+        for restaurant in result_restaurant_list:
             restaurant_coordinates = fetch_coordinates(GEO_APIKEY, restaurant.address)
             distance_to_restaurant.append(round(distance.distance(
                 (order_coordinates.lat, order_coordinates.lon),
                 (restaurant_coordinates.lat, restaurant_coordinates.lon)).km, 3))
-        restaurant_distance_dict = dict(zip(list(result_restaurant_list),
+        restaurant_distance_dict = dict(zip(result_restaurant_list,
                                             distance_to_restaurant))
 
         sorted_restaurant_distance_dict_keys = sorted(restaurant_distance_dict,

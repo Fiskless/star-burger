@@ -11,15 +11,10 @@ from foodcartapp.models import Order
 from foodcartapp.models import RestaurantMenuItem
 from foodcartapp.models import Product, Restaurant
 from place.models import Place
+from star_burger.settings import GEO_APIKEY
 
 import requests
 from geopy import distance
-from environs import Env
-
-env = Env()
-env.read_env()
-
-GEO_APIKEY = env('GEO_APIKEY')
 
 
 class Login(forms.Form):

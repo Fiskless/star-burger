@@ -11,7 +11,7 @@ env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+GEO_APIKEY = env('GEO_APIKEY')
 SECRET_KEY = env('SECRET_KEY', 'etirgvonenrfniuythjkrenogneongg334g')
 DEBUG = env.bool('DEBUG', 'True')
 

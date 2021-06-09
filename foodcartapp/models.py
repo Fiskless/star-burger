@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class Restaurant(models.Model):
-    name = models.CharField('название', max_length=50)
+    name = models.CharField('название', max_length=50, db_index=True)
     address = models.CharField('адрес', max_length=100, blank=True)
     contact_phone = models.CharField('контактный телефон',
                                      max_length=50, blank=True)

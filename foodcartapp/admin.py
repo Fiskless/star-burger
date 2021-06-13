@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.shortcuts import redirect
@@ -11,6 +11,9 @@ from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
 from .models import OrderProduct
+from restaurateur import views
+from django.http import HttpResponse
+
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -127,7 +130,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         res = super().response_change(request, obj)
-        if request.GET.get('next') == '/manager/orders/' and \
+        if request.GET.get('next') == reverse('restaurateur:view_orders') and \
             url_has_allowed_host_and_scheme(request.GET['next'], None):
             return redirect(request.GET['next'])
         return res

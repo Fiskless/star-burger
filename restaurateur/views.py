@@ -101,7 +101,6 @@ def view_restaurants(request):
     })
 
 
-
 def fetch_coordinates(apikey, place):
 
     place_data = Place.objects.filter(address=place).first()
@@ -117,12 +116,10 @@ def fetch_coordinates(apikey, place):
     return Place.objects.create(address=place, lon=lon, lat=lat)
 
 
-
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
     order_items = []
-
     for order in Order.objects.prefetch_related('products').order_price():
         order_coordinates = fetch_coordinates(GEO_APIKEY, order.address)
         restaurant_list =[

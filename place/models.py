@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from foodcartapp.models import Order, Restaurant
+
 
 class Place(models.Model):
     address = models.CharField('адрес', max_length=100,

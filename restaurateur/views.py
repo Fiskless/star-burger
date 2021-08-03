@@ -103,11 +103,9 @@ def view_restaurants(request):
 
 def fetch_coordinates(apikey, place):
 
-    place_data = Place.objects.filter(address=place).first()
-    if place_data is not None:
-        return place_data
     base_url = "https://geocode-maps.yandex.ru/1.x"
-    params = {"geocode": place, "apikey": apikey, "format": "json"}
+    params = {"geocode":
+                  place, "apikey": apikey, "format": "json"}
     response = requests.get(base_url, params=params)
     response.raise_for_status()
     found_places = response.json()['response']['GeoObjectCollection']['featureMember']
@@ -116,12 +114,22 @@ def fetch_coordinates(apikey, place):
     return Place.objects.create(address=place, lon=lon, lat=lat)
 
 
+def get_place_coordinates(new_place, exists_places_data):
+    if new_place not in exists_places_data:
+        order_coordinates = fetch_coordinates(GEO_APIKEY, new_place)
+        return order_coordinates.lat, order_coordinates.lon
+    order_coordinates_lat = exists_places_data[new_place].lat
+    order_coordinates_lon = exists_places_data[new_place].lon
+    return order_coordinates_lat, order_coordinates_lon
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
+    places_data = Place.objects.in_bulk(field_name='address')
     order_items = []
     for order in Order.objects.prefetch_related('products').order_price():
-        order_coordinates = fetch_coordinates(GEO_APIKEY, order.address)
+        order_coordinates_lat, order_coordinates_lon = get_place_coordinates(order.address, places_data)
         restaurant_list =[
             [menu_item.restaurant for menu_item in (
             RestaurantMenuItem.objects.select_related('product', 'restaurant').
@@ -132,10 +140,11 @@ def view_orders(request):
             result_restaurant_list = (set(result_restaurant_list) & set(restaurant))
         distance_to_restaurant = []
         for restaurant in result_restaurant_list:
-            restaurant_coordinates = fetch_coordinates(GEO_APIKEY, restaurant.address)
+            restaurant_coordinates_lat, restaurant_coordinates_lon = get_place_coordinates(
+                restaurant.address, places_data)
             distance_to_restaurant.append(round(distance.distance(
-                (order_coordinates.lat, order_coordinates.lon),
-                (restaurant_coordinates.lat, restaurant_coordinates.lon)).km, 3))
+                (order_coordinates_lat, order_coordinates_lon),
+                (restaurant_coordinates_lat, restaurant_coordinates_lon)).km, 3))
         restaurant_distance_dict = dict(zip(result_restaurant_list,
                                             distance_to_restaurant))
 

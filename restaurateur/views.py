@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
+from django.conf import settings
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -11,7 +12,6 @@ from foodcartapp.models import Order
 from foodcartapp.models import RestaurantMenuItem
 from foodcartapp.models import Product, Restaurant
 from place.models import Place
-from star_burger.settings import GEO_APIKEY
 
 import requests
 from geopy import distance
@@ -116,7 +116,7 @@ def fetch_coordinates(apikey, place):
 
 def get_place_coordinates(new_place, exists_places_data):
     if new_place not in exists_places_data:
-        order_coordinates = fetch_coordinates(GEO_APIKEY, new_place)
+        order_coordinates = fetch_coordinates(settings.GEO_APIKEY, new_place)
         return order_coordinates.lat, order_coordinates.lon
     order_coordinates_lat = exists_places_data[new_place].lat
     order_coordinates_lon = exists_places_data[new_place].lon

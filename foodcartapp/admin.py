@@ -130,8 +130,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         res = super().response_change(request, obj)
-        if request.GET.get('next') == reverse('restaurateur:view_orders') and \
-            url_has_allowed_host_and_scheme(request.GET['next'], None):
+        if url_has_allowed_host_and_scheme(request.GET['next'], None):
             return redirect(request.GET['next'])
         return res
 

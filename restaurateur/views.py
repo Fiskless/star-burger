@@ -137,7 +137,7 @@ def view_orders(request):
                             if order_product['order_id']==order.id]
         restaurant_list =[
             [menu_item.restaurant for menu_item in menu_items
-                if menu_item.product.id == product] for product in order_products_ids
+                if menu_item.product.id == product_id] for product_id in order_products_ids
         ]
         result_restaurant_list = restaurant_list[0]
         for restaurant in restaurant_list:

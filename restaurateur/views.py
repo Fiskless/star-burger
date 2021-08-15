@@ -127,7 +127,8 @@ def get_place_coordinates(new_place, exists_places_data):
 def view_orders(request):
 
     places_data = Place.objects.in_bulk(field_name='address')
-    menu_items = RestaurantMenuItem.objects.select_related('product', 'restaurant').filter(availability=True).in_bulk().values()
+    menu_items = RestaurantMenuItem.objects.select_related('product', 'restaurant')\
+        .filter(availability=True).in_bulk().values()
     order_items = []
     order_products = OrderProduct.objects.select_related('product').values()
     for order in Order.objects.prefetch_related('products').order_price():

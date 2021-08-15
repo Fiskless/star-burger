@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-from foodcartapp.models import Order
+from foodcartapp.models import Order, OrderProduct
 from foodcartapp.models import RestaurantMenuItem
 from foodcartapp.models import Product, Restaurant
 from place.models import Place
@@ -127,14 +127,17 @@ def get_place_coordinates(new_place, exists_places_data):
 def view_orders(request):
 
     places_data = Place.objects.in_bulk(field_name='address')
+    menu_items = RestaurantMenuItem.objects.select_related('product', 'restaurant').filter(availability=True).in_bulk().values()
     order_items = []
+    order_products = OrderProduct.objects.select_related('product').values()
     for order in Order.objects.prefetch_related('products').order_price():
         order_coordinates_lat, order_coordinates_lon = get_place_coordinates(order.address, places_data)
+        order_products_ids = [order_product['product_id'] for order_product in order_products
+                            if order_product['order_id']==order.id]
         restaurant_list =[
-            [menu_item.restaurant for menu_item in (
-            RestaurantMenuItem.objects.select_related('product', 'restaurant').
-                filter(product__id=product.product.id, availability=True))
-             ] for product in order.products.all()]
+            [menu_item.restaurant for menu_item in menu_items
+                if menu_item.product.id == product] for product in order_products_ids
+        ]
         result_restaurant_list = restaurant_list[0]
         for restaurant in restaurant_list:
             result_restaurant_list = (set(result_restaurant_list) & set(restaurant))

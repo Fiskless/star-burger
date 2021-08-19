@@ -58,6 +58,11 @@ class Product(models.Model):
         return self.name
 
 
+class RestaurantMenuItemQuerySet(models.QuerySet):
+    def available(self):
+        return self.distinct().filter(availability=True)
+
+
 class RestaurantMenuItem(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE,
                                    related_name='menu_items',
@@ -67,6 +72,8 @@ class RestaurantMenuItem(models.Model):
                                 verbose_name='продукт')
     availability = models.BooleanField('в продаже', default=True,
                                        db_index=True)
+
+    objects = RestaurantMenuItemQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'пункт меню ресторана'
@@ -103,7 +110,7 @@ class Order(models.Model):
 
     order_status = models.CharField("Статус заказа", max_length=20,
                                     choices=ORDER_STATUS_CHOICES,
-                                    default="необработанный",
+                                    default="Необработанный",
                                     db_index=True)
     payment_method = models.CharField("Способ оплаты", max_length=20,
                                       choices=PAYMENT_METHOD_CHOICES,

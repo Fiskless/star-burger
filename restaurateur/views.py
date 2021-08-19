@@ -1,4 +1,6 @@
 from django import forms
+from django.db.models import Q
+from django.db.models.query import Prefetch
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
@@ -15,6 +17,7 @@ from place.models import Place
 
 import requests
 from geopy import distance
+from functools import reduce
 
 
 class Login(forms.Form):
@@ -126,30 +129,56 @@ def get_place_coordinates(new_place, exists_places_data):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
-    places_data = Place.objects.in_bulk(field_name='address')
-    menu_items = RestaurantMenuItem.objects.select_related('product', 'restaurant')\
-        .filter(availability=True).in_bulk().values()
+    nonprocessed_orders = (
+        Order.objects
+            .filter(order_status='Необработанный')
+            .prefetch_related('products')
+            .order_price()
+    )
+
+    places = (
+        Place.objects
+            .filter(
+                Q(address__in=nonprocessed_orders.values_list('address')) |
+                Q(address__in=Restaurant.objects.values_list('address'))
+            )
+            .in_bulk(field_name='address')
+    )
+    menu_items = (
+        RestaurantMenuItem.objects
+            .prefetch_related('products')
+            .available()
+    )
+
+    restaurants = Restaurant.objects.prefetch_related(
+        Prefetch('menu_items', menu_items)
+    )
+
     order_items = []
-    order_products = OrderProduct.objects.select_related('product').values()
-    for order in Order.objects.prefetch_related('products').order_price():
-        order_coordinates_lat, order_coordinates_lon = get_place_coordinates(order.address, places_data)
-        order_products_ids = [order_product['product_id'] for order_product in order_products
-                            if order_product['order_id']==order.id]
-        restaurant_list =[
-            [menu_item.restaurant for menu_item in menu_items
-                if menu_item.product.id == product_id] for product_id in order_products_ids
+    for order in nonprocessed_orders:
+        order_coordinates_lat, order_coordinates_lon = get_place_coordinates(order.address, places)
+
+        order_products_ids = [order_product.product_id for order_product in order.products.all()]
+
+        restaurants_list =[
+            restaurants.filter(menu_items__product_id=order_product_id) for order_product_id in order_products_ids
         ]
-        result_restaurant_list = restaurant_list[0]
-        for restaurant in restaurant_list:
-            result_restaurant_list = (set(result_restaurant_list) & set(restaurant))
+
+        result_restaurants = set(reduce(lambda a, b: a & b, restaurants_list))
+
         distance_to_restaurant = []
-        for restaurant in result_restaurant_list:
+
+        for restaurant in result_restaurants:
             restaurant_coordinates_lat, restaurant_coordinates_lon = get_place_coordinates(
-                restaurant.address, places_data)
-            distance_to_restaurant.append(round(distance.distance(
+                restaurant.address, places)
+
+            delivery_distance = distance.distance(
                 (order_coordinates_lat, order_coordinates_lon),
-                (restaurant_coordinates_lat, restaurant_coordinates_lon)).km, 3))
-        restaurant_distance_dict = dict(zip(result_restaurant_list,
+                (restaurant_coordinates_lat, restaurant_coordinates_lon))
+
+            distance_to_restaurant.append(round(delivery_distance.km, 3))
+
+        restaurant_distance_dict = dict(zip(result_restaurants,
                                             distance_to_restaurant))
 
         sorted_restaurant_distance_dict_keys = sorted(restaurant_distance_dict,
@@ -159,7 +188,7 @@ def view_orders(request):
             key: restaurant_distance_dict[key] for key in sorted_restaurant_distance_dict_keys
         }
 
-        order_data = {
+        order_items.append({
             'id': order.id,
             'order_status': order.order_status,
             'order_price': order.total_price,
@@ -169,9 +198,7 @@ def view_orders(request):
             'comment': order.comment,
             'payment_method': order.payment_method,
             'restaurant_distance': sorted_restaurant_distance_dict
-        }
-
-        order_items.append(order_data)
+        })
 
     return render(request,
                   template_name='order_items.html',

@@ -146,7 +146,7 @@ def view_orders(request):
     )
     menu_items = (
         RestaurantMenuItem.objects
-            .prefetch_related('products')
+            .prefetch_related('product')
             .available()
     )
 

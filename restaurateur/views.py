@@ -144,106 +144,20 @@ def view_orders(request):
             )
             .in_bulk(field_name='address')
     )
-    # menu_items = (
-    #     RestaurantMenuItem.objects
-    #         .prefetch_related('restaurant', 'product')
-    #         .available()
-    #         .in_bulk()
-    #         .values()
-    # )
-    #
-    # # print(menu_items)
+
     products = Product.objects.all()
     restaurants = Restaurant.objects.all()
     products_with_restaurants = {
         product.id: restaurants.filter(menu_items__product__id=product.id) for
                                  product in products
     }
-    # products_with_restaurants = { product
-    #     for product in menu_items.products.all()
-    # }
-    # products_with_restaurants = {menu_item.product_id: menu_item.restaurant for
-    #                              menu_item in menu_items}
-    # print(products_with_restaurants)
-
-    menu_items1 = (
-        RestaurantMenuItem.objects
-            .available()
-    )
-    # print(menu_items1)
-
-    restaurants = (
-        Restaurant.objects
-            .prefetch_related(Prefetch('menu_items', menu_items1))
-    )
-
 
     order_items = []
     for order in nonprocessed_orders:
         order_coordinates_lat, order_coordinates_lon = get_place_coordinates(order.address, places)
 
         order_products_ids = [order_product.product_id for order_product in order.products.all()]
-        print(order_products_ids)
         restaurants = [products_with_restaurants[product_id] for product_id in order_products_ids]
-
-
-        # print(order_products_ids)
-
-        # restaurants_list1 = [
-        #     restaurants.filter(Q(menu_items__product_id=order_product_id)) for
-        #     order_product_id in order_products_ids
-        # ]
-        # print(restaurants_list1)
-        # print(order_products)
-        # restaurants_list =[
-        #     restaurants.filter(menu_items__product_id=order_product_id) for order_product_id in order_products_ids
-        # ]
-        # print(restaurants_list)
-        # menu_items5 = [rest.menu_items.all() for rest in restaurants]
-        # print(menu_items5)
-
-        # restaurant_list2 = [
-        #     [menu_item.restaurant for menu_item in menu_items.filter(product_id=product_id)]
-        #     for product_id in order_products_ids]
-        # # print(restaurant_list2)
-
-        # menu_items_ids = [menu_item.product_id for menu_item in menu_items]
-        # print(menu_items_ids)
-        # rest = menu_items[0].restaurant.all()
-        # print(rest)
-
-        # restaurants_list = [
-        #     [menu_item.restaurant for menu_item in menu_items
-        #      if menu_item.product_id == product_id] for product_id in
-        #      order_products_ids]
-        # # print(restaurants_list)
-        #
-        # restaurants_list1 = [
-        #     menu_item.restaurant for menu_item in menu_items
-        #      if menu_item.product_id in order_products_ids]
-        # print(restaurants_list1)
-        # print(restaurants_list1)
-
-
-        # menu_items_with_restaurants = [
-        #     order_product.product.menu_items.all() for order_product in order.products.all()
-        # ]
-        #
-        # restaurants_list1 = [
-        #     [menu_item.restaurant for menu_item in menu_items]
-        #     for menu_items in menu_items_with_restaurants
-        # ]
-
-        #
-        # print(restaurants_list1)
-        # result_restaurant_list = restaurants_list[0]
-        # for restaurant in restaurants_list:
-        #     result_restaurant_list = (
-        #             set(result_restaurant_list) & set(restaurant))
-        # result_restaurant_list1 = restaurants_list1[0]
-        # for restaurant in restaurants_list1:
-        #     result_restaurant_list1 = (
-        #         set(result_restaurant_list) & set(restaurant))
 
         result_restaurants = (reduce(lambda a, b: set(a) & set(b),
                                      restaurants))
@@ -260,14 +174,14 @@ def view_orders(request):
 
             distance_to_restaurant.append(round(delivery_distance.km, 3))
 
-        restaurant_distance = dict(zip(result_restaurants,
+        restaurant_with_distance = dict(zip(result_restaurants,
                                             distance_to_restaurant))
 
-        sorted_restaurant_distance_keys = sorted(restaurant_distance,
-                                                      key=restaurant_distance.get)
+        sorted_restaurant_with_distance_keys = sorted(restaurant_with_distance,
+                                                      key=restaurant_with_distance.get)
 
-        sorted_restaurant_distance = {
-            key: restaurant_distance[key] for key in sorted_restaurant_distance_keys
+        sorted_restaurant_with_distance = {
+            key: restaurant_with_distance[key] for key in sorted_restaurant_with_distance_keys
         }
 
         order_items.append({
@@ -279,7 +193,7 @@ def view_orders(request):
             'address': order.address,
             'comment': order.comment,
             'payment_method': order.payment_method,
-            'restaurant_distance': sorted_restaurant_distance
+            'restaurant_distance': sorted_restaurant_with_distance
         })
 
     return render(request,

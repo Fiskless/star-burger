@@ -134,6 +134,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "bundles"),
 ]
 
+
 local_repo = Repo(path=BASE_DIR)
 local_branch = local_repo.active_branch.name
 
@@ -144,6 +145,4 @@ ROLLBAR = {
     'root': BASE_DIR,
 }
 rollbar.init(**ROLLBAR)
-
-#Add some string
 

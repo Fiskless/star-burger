@@ -147,7 +147,10 @@ ROLLBAR = {
 rollbar.init(**ROLLBAR)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #Some string to check deploy
 
 >>>>>>> 715bcfd7cdd0c6a403ead332a56ad41047a0b2e0
+=======
+>>>>>>> 57b9f675037ea94dd942e3a07a5261b8acaae92e

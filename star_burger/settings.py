@@ -146,4 +146,3 @@ ROLLBAR = {
 }
 rollbar.init(**ROLLBAR)
 
-#Add line

@@ -180,9 +180,9 @@ parcel build bundles-src/index.js -d bundles --public-url="./"
 ```
 
 Координаты сервера:
-- домен: starburgerfsk.tk;
-- IP: 164.90.177.245;
-- имя пользователя: root.
+- `домен: starburgerfsk.tk`
+- `IP: 164.90.177.245`
+- `имя пользователя: root`.
 
 ## Цели проекта
 

@@ -1,9 +1,10 @@
 import os
 
 import dj_database_url
+import rollbar
 
 from environs import Env
-
+from git import Repo
 
 env = Env()
 env.read_env()
@@ -14,6 +15,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 GEO_APIKEY = env('GEO_APIKEY')
 SECRET_KEY = env('SECRET_KEY', 'etirgvonenrfniuythjkrenogneongg334g')
 DEBUG = env.bool('DEBUG', 'True')
+ROLLBAR_TOKEN = env('ROLLBAR_TOKEN')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
@@ -41,6 +43,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
 ROOT_URLCONF = 'star_burger.urls'
@@ -84,9 +88,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
+    'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': env('NAME_DB'),
+            'USER': env('USERNAME_DB'),
+            'PASSWORD': env('PASSWORD_DB'),
+            'HOST': 'localhost',
+            'PORT': '',
+        }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,8 +129,18 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
 ]
+
+local_repo = Repo(path=BASE_DIR)
+local_branch = local_repo.active_branch.name
+
+ROLLBAR = {
+    'access_token': ROLLBAR_TOKEN,
+    'environment': 'development' if DEBUG else 'production',
+    'branch': local_branch,
+    'root': BASE_DIR,
+}
+rollbar.init(**ROLLBAR)

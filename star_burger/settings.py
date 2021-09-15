@@ -145,5 +145,3 @@ ROLLBAR = {
 }
 rollbar.init(**ROLLBAR)
 
-#Some string to check deploy
-

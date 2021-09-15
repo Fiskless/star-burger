@@ -68,7 +68,8 @@ cd star-burger
 pip install -r requirements.txt
 ```
 
-Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
+В качестве юазы данных используется Postgres. Подробное описание о подключении [здесь](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04)
+После подключения необходимо применить настройки данной СУБД, для этого выполните команду ниже:
 
 ```sh
 python manage.py migrate
@@ -155,6 +156,10 @@ parcel build bundles-src/index.js -d bundles --public-url="./"
 - `DEBUG` — дебаг-режим. Поставьте `False`.
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте. Не стоит использовать значение по-умолчанию, **замените на своё**.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+- `ROLLBAR_TOKEN` — токен для доступа к [Rollbar](https://rollbar.com/)
+- `NAME_DB` — имя базы данных, созданной при подключении Postgres
+- `USERNAME_DB` — имя пользователя базы данных, созданной при подключении Postgres
+- `PASSWORD_DB` — пароль к базе данных, созданной при подключении Postgres
 
 ## Цели проекта
 

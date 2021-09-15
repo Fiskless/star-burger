@@ -14,7 +14,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 GEO_APIKEY = env('GEO_APIKEY')
 SECRET_KEY = env('SECRET_KEY', 'etirgvonenrfniuythjkrenogneongg334g')
+<<<<<<< HEAD
 DEBUG = env.bool('DEBUG')
+=======
+DEBUG = env.bool('DEBUG', 'True')
+>>>>>>> 74052877b3e3350453aff4b27e5c6bc08b080853
 ROLLBAR_TOKEN = env('ROLLBAR_TOKEN')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
@@ -129,13 +133,15 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
 ]
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 74052877b3e3350453aff4b27e5c6bc08b080853
 local_repo = Repo(path=BASE_DIR)
 local_branch = local_repo.active_branch.name
 
@@ -146,4 +152,7 @@ ROLLBAR = {
     'root': BASE_DIR,
 }
 rollbar.init(**ROLLBAR)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 74052877b3e3350453aff4b27e5c6bc08b080853

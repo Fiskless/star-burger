@@ -142,7 +142,7 @@ local_branch = local_repo.active_branch.name
 
 ROLLBAR = {
     'access_token': ROLLBAR_TOKEN,
-    'environment': 'development' if DEBUG else 'production',
+    'environment': env('ROLLBAR_ENVIRONMENT'),
     'branch': local_branch,
     'root': BASE_DIR,
 }

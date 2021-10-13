@@ -86,8 +86,6 @@ WSGI_APPLICATION = 'star_burger.wsgi.application'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-NAME_DB, USERNAME_DB, PASSWORD_DB = env.list('POSTGRES_DB_INFO')
-
 DATABASES = {
     'default': env.dj_db_url("POSTGRES_DB_URL")
 }

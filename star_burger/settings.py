@@ -1,6 +1,5 @@
 import os
 
-import dj_database_url
 import rollbar
 
 from environs import Env
@@ -90,14 +89,7 @@ MEDIA_URL = '/media/'
 NAME_DB, USERNAME_DB, PASSWORD_DB = env.list('POSTGRES_DB_INFO')
 
 DATABASES = {
-    'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': NAME_DB,
-            'USER': USERNAME_DB,
-            'PASSWORD': PASSWORD_DB,
-            'HOST': 'localhost',
-            'PORT': '',
-        }
+    'default': env.dj_db_url("POSTGRES_DB_URL")
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -147,4 +139,3 @@ ROLLBAR = {
     'root': BASE_DIR,
 }
 rollbar.init(**ROLLBAR)
-

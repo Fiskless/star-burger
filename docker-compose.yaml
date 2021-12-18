@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  django:
+    build: .
+    command: bash -c "python /code/manage.py migrate --noinput && python /code/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DATABASE_URL: ${POSTGRES_DB_URL}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      GEO_APIKEY: ${GEO-APIKEY}
+      ROLLBAR_TOKEN: ${ROLLBAR_TOKEN}
+      ROLLBAR_ENVIRONMENT: ${ROLLBAR_ENVIRONMENT}
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+

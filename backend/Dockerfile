@@ -2,8 +2,7 @@ FROM python:latest
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
-RUN mkdir /code
-WORKDIR /code
+WORKDIR /code/
 COPY requirements.txt /code/
 
 RUN apt update && apt install -y python3-pip                                  \
@@ -11,6 +10,8 @@ RUN apt update && apt install -y python3-pip                                  \
     && apt remove -y python3-pip                                              \
     && apt autoremove --purge -y                                              \
     && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /code/bundles/
 
 COPY . /code/
 

@@ -71,6 +71,9 @@ docker-compose up
 docker-compose run django ./manage.py createsuperuser
 ```
 
+Сайт будет доступен по адресу [0.0.0.0:1337](http://0.0.0.0:1337/):
+
+
 Для тонкой настройки используйте переменные окружения. Список доступных переменных можно найти внутри файла `docker-compose.yml`.
 
 

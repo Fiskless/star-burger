@@ -127,13 +127,13 @@ STATICFILES_DIRS = [
 ]
 
 
-local_repo = Repo(path=BASE_DIR)
-local_branch = local_repo.active_branch.name
+# local_repo = Repo(path=os.path.join(BASE_DIR))
+# local_branch = local_repo.active_branch.name
 
-ROLLBAR = {
-    'access_token': ROLLBAR_TOKEN,
-    'environment': env('ROLLBAR_ENVIRONMENT', 'production'),
-    'branch': local_branch,
-    'root': BASE_DIR,
-}
-rollbar.init(**ROLLBAR)
+# ROLLBAR = {
+#     'access_token': ROLLBAR_TOKEN,
+#     'environment': env('ROLLBAR_ENVIRONMENT', 'production'),
+#     'branch': local_branch,
+#     'root': BASE_DIR,
+# }
+# rollbar.init(**ROLLBAR)
